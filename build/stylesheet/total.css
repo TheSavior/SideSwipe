@@ -1,0 +1,53 @@
+body, html {
+  margin: 0;
+  padding: 0; }
+
+#touchContainer {
+  position: absolute;
+  width: 290px;
+  height: 290px;
+  left: 50%;
+  top: 50%;
+  margin-left: -145px;
+  margin-top: -145px; }
+
+#template {
+  display: none; }
+
+.imageWrapper {
+  border: 1px solid #333;
+  display: inline-block;
+  background-color: white;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -145px;
+  margin-top: -145px; }
+  .imageWrapper .voteType {
+    position: absolute;
+    border-radius: 5px;
+    padding: 5px;
+    border: 2px solid black;
+    font-weight: bold;
+    font-size: 26px;
+    top: 15px;
+    opacity: 0; }
+  .imageWrapper .nope {
+    border-color: red;
+    color: red;
+    right: 15px;
+    -webkit-transform: rotate(20deg); }
+  .imageWrapper .yep {
+    border-color: green;
+    color: green;
+    left: 15px;
+    -webkit-transform: rotate(-20deg); }
+  .imageWrapper img {
+    vertical-align: bottom; }
+  .imageWrapper .bottom {
+    padding: 10px;
+    border-top: 1px solid #333; }
+  .imageWrapper.ani5 {
+    transition: all .5s; }
+    .imageWrapper.ani5 .voteType {
+      transition: all .5s; }

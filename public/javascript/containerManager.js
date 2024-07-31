@@ -1,4 +1,4 @@
-define(["userManager"], function(UserManager) {
+define(["userManager"], function (UserManager) {
   function ContainerManager(wrapper) {
     this._init(wrapper);
   }
@@ -22,7 +22,7 @@ define(["userManager"], function(UserManager) {
     // We set each container to have a zIndex one further back
     _zIndexCounter: 1000,
 
-    _init: function(wrapper) {
+    _init: function (wrapper) {
       this._wrapper = wrapper;
 
       this._userManager = new UserManager();
@@ -41,7 +41,7 @@ define(["userManager"], function(UserManager) {
     },
 
     // Create a new container element we can activate
-    _createContainer: function() {
+    _createContainer: function () {
       var container = this._template.cloneNode(true);
       this._wrapper.insertBefore(container, this._wrapper.children[0]);
       this._deactivateContainer(container);
@@ -50,7 +50,7 @@ define(["userManager"], function(UserManager) {
     },
 
     // When we need a new container to use
-    _activateContainer: function() {
+    _activateContainer: function () {
       var container = this._inactiveContainers.pop();
       container.style.visibility = "";
       this._activeContainers.push(container);
@@ -58,13 +58,13 @@ define(["userManager"], function(UserManager) {
     },
 
     // When we are done using a container on the screen
-    _deactivateContainer: function(container) {
+    _deactivateContainer: function (container) {
       container.style.visibility = "hidden";
       this._inactiveContainers.push(container);
     },
 
     // Grab the next user and put them on the page
-    _setUpNextContainer: function() {
+    _setUpNextContainer: function () {
       // In a real app, we would need to handle not having a next user
       // Likely using a callback or some sort of queue processing
       if (this._userManager.hasNextUser()) {
@@ -81,17 +81,16 @@ define(["userManager"], function(UserManager) {
       }
     },
 
-    _getCurrentContainer: function() {
+    _getCurrentContainer: function () {
       return this._activeContainers[0];
     },
 
     // The container has been swiped far enough to be removed
-    _containerFinished: function() {
+    _containerFinished: function () {
       this._activeContainers.shift();
     },
 
-
-    _registerDrag: function() {
+    _registerDrag: function () {
       var self = this;
 
       // Where did we click when we started our drag
@@ -115,18 +114,21 @@ define(["userManager"], function(UserManager) {
       var rotate = 0;
 
       // How far horizontally do we need to drag for it to be a success
-      var horizontalSuccess = .4;
+      var horizontalSuccess = 0.4;
 
       // Called when a drag is released that wasn't dragged far enough
       function reset() {
         resetting = true;
         var currentContainer = self._getCurrentContainer();
 
-        var transitionEnd = function() {
+        var transitionEnd = function () {
           currentContainer.classList.remove("ani5");
           resetting = false;
-          currentContainer.removeEventListener("webkitTransitionEnd", transitionEnd);
-        }
+          currentContainer.removeEventListener(
+            "webkitTransitionEnd",
+            transitionEnd
+          );
+        };
 
         currentContainer.addEventListener("webkitTransitionEnd", transitionEnd);
         currentContainer.classList.add("ani5");
@@ -136,8 +138,7 @@ define(["userManager"], function(UserManager) {
       }
 
       function touchStart(e) {
-        if (resetting) 
-          return;
+        if (resetting) return;
 
         var touch = e.touches[0];
         startX = touch.clientX;
@@ -146,21 +147,20 @@ define(["userManager"], function(UserManager) {
         var windowWidth = window.innerWidth;
         var windowHeight = window.innerHeight;
 
-        var touchMove = function(e) {
+        var touchMove = function (e) {
           e.preventDefault();
 
-          if (resetting)
-            return;
+          if (resetting) return;
 
           var touch = e.touches[0];
 
-          shiftX = (touch.clientX - startX);
-          shiftY = (touch.clientY - startY);
+          shiftX = touch.clientX - startX;
+          shiftY = touch.clientY - startY;
 
           xdist = shiftX / (windowWidth / 2);
           ydist = shiftY / (windowHeight / 2);
 
-          rotate = (ydist * xdist) * 20 + (xdist * 15);
+          rotate = ydist * xdist * 20 + xdist * 15;
 
           var image = self._getCurrentContainer();
 
@@ -174,18 +174,25 @@ define(["userManager"], function(UserManager) {
             image.children[1].style.opacity = 0;
           }
 
-          image.style.webkitTransform = "translate3d(" + shiftX + "px, " + shiftY + "px, 0px) rotate(" + rotate + "deg)";
+          image.style.webkitTransform =
+            "translate3d(" +
+            shiftX +
+            "px, " +
+            shiftY +
+            "px, 0px) rotate(" +
+            rotate +
+            "deg)";
         };
 
-        var touchEnd = function(e) {
-          if (resetting)
-            return;
+        var touchEnd = function (e) {
+          if (resetting) return;
 
-          window.removeEventListener("touchmove", touchMove);
+          window.removeEventListener("touchmove", touchMove, {
+            passive: false,
+          });
           window.removeEventListener("touchend", touchEnd);
 
           if (xdist > horizontalSuccess || xdist < -1 * horizontalSuccess) {
-
             var currentContainer = self._getCurrentContainer();
             self._containerFinished();
 
@@ -196,18 +203,31 @@ define(["userManager"], function(UserManager) {
               shiftX *= -1;
             }
 
-            currentContainer.style.webkitTransform = "translate3d(" + shiftX + "px, " + shiftY + "px, 0px) rotate(" + rotate + "deg)";
+            currentContainer.style.webkitTransform =
+              "translate3d(" +
+              shiftX +
+              "px, " +
+              shiftY +
+              "px, 0px) rotate(" +
+              rotate +
+              "deg)";
 
-            var transitionEnd = function() {
+            var transitionEnd = function () {
               currentContainer.classList.remove("ani5");
               self._deactivateContainer(currentContainer);
 
               // add a new one!
               self._setUpNextContainer();
-              currentContainer.removeEventListener("webkitTransitionEnd", transitionEnd);
-            }
+              currentContainer.removeEventListener(
+                "webkitTransitionEnd",
+                transitionEnd
+              );
+            };
 
-            currentContainer.addEventListener("webkitTransitionEnd", transitionEnd);
+            currentContainer.addEventListener(
+              "webkitTransitionEnd",
+              transitionEnd
+            );
 
             return;
           }
@@ -215,15 +235,14 @@ define(["userManager"], function(UserManager) {
           reset();
         };
 
-        if (resetting)
-          return;
+        if (resetting) return;
 
-        window.addEventListener("touchmove", touchMove);
+        window.addEventListener("touchmove", touchMove, {passive: false});
         window.addEventListener("touchend", touchEnd);
-      };
+      }
 
       touchContainer.addEventListener("touchstart", touchStart);
-    }
+    },
   };
 
   return ContainerManager;
